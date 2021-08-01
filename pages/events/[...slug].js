@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { /* getFilteredEvents, */ URL } from '../../utils/api-util';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
+import Head from 'next/head';
 
 import EventList from '../../components/events/EventList';
 import ResultsTitle from '../../components/events/results-title';
@@ -31,12 +32,38 @@ const FilteredEvents = (props) => {
     }
   }, [data]);
 
-  if (!events) return <p className='center'>Loading...</p>;
+  let pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta name='description' content={`A list of filtered events`} />
+    </Head>
+  );
+
+  if (!events) {
+    return (
+      <>
+        {pageHeadData}
+        <p className='center'>Loading...</p>;
+      </>
+    );
+  }
 
   const year = filteredData[0];
   const month = filteredData[1];
   const numYear = +year;
   const numMonth = +month;
+
+  pageHeadData = (
+    <Head>
+      <title>
+        Events for {month}/{year}
+      </title>
+      <meta
+        name='description'
+        content={`Search results for events of ${month}/${year}`}
+      />
+    </Head>
+  );
 
   if (
     isNaN(numYear) ||
@@ -49,6 +76,7 @@ const FilteredEvents = (props) => {
   ) {
     return (
       <>
+        {pageHeadData}
         <ErrorAlert>
           <p className='center'>Invalid filters, please adjust your values.</p>
         </ErrorAlert>
@@ -70,6 +98,7 @@ const FilteredEvents = (props) => {
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
       <>
+        {pageHeadData}
         <ErrorAlert>
           <p className='center'>
             No events found for your filters. Please try again.
@@ -85,10 +114,11 @@ const FilteredEvents = (props) => {
   const date = new Date(numYear, numMonth - 1);
 
   return (
-    <div>
+    <>
+      {pageHeadData}
       <ResultsTitle date={date} />
       <EventList items={filteredEvents} />
-    </div>
+    </>
   );
 };
 
