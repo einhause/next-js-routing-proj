@@ -9,6 +9,7 @@ import EventLogistics from '../../components/event-detail/event-logistics';
 import EventContent from '../../components/event-detail/event-content';
 import ErrorAlert from '../../components/ui/error-alert';
 import Button from '../../components/ui/Button';
+import Comments from '../../components/input/comments';
 
 const SingleEvent = (props) => {
   const event = props.singleEvent;
@@ -37,6 +38,7 @@ const SingleEvent = (props) => {
       <EventContent>
         <p>{event.description}</p>
       </EventContent>
+      <Comments eventId={event.id} />
     </>
   );
 };
