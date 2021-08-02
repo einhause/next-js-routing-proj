@@ -1,3 +1,6 @@
+import Image from 'next/image';
+// For image optimization
+
 import React from 'react';
 import Button from '../ui/Button';
 import { humanReadableDate } from '../../utils/dateFormatting';
@@ -15,7 +18,7 @@ const EventItem = ({ id, title, location, date, image }) => {
 
   return (
     <li className={classes.item}>
-      <img src={`/${image}`} alt={title} />
+      <Image src={`/${image}`} alt={title} width={275} height={160} />
       <div className={classes.content}>
         <div className={classes.summary}>
           <h2>{title}</h2>
