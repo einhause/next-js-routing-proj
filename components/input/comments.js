@@ -9,7 +9,7 @@ function Comments(props) {
   const { eventId } = props;
 
   const [showComments, setShowComments] = useState(false);
-  const [fetchedComments, setFetchedComments] = useState(null);
+  const [fetchedComments, setFetchedComments] = useState([]);
 
   useEffect(() => {
     if (showComments) {
@@ -41,7 +41,7 @@ function Comments(props) {
         {showComments ? 'Hide' : 'Show'} Comments
       </button>
       {showComments && <NewComment onAddComment={addCommentHandler} />}
-      {showComments && <CommentList items={comments} />}
+      {showComments && <CommentList items={fetchedComments} />}
     </section>
   );
 }

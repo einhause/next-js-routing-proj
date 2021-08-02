@@ -1,8 +1,22 @@
 import emailRegex from '../../../utils/emailRegex';
-import { v4 as uuidv4 } from 'uuid';
+import {
+  connectDB,
+  insertDocument,
+  getAllDocuments,
+} from '../../../utils/db-util';
 
-const handler = (req, res) => {
+const handler = async (req, res) => {
   const eventId = req.query.eventId;
+
+  let client;
+
+  try {
+    client = await connectDB();
+  } catch (err) {
+    res.status(500).json({ message: 'Connecting to the database failed.' });
+    client.close();
+    return;
+  }
 
   if (req.method === 'POST') {
     // add server side validation
@@ -15,26 +29,41 @@ const handler = (req, res) => {
       !text ||
       text.trim() === ''
     ) {
-      return res.status(422).json({ message: 'Invalid input' });
+      res.status(422).json({ message: 'Invalid input' });
+      client.close();
+      return;
     }
 
     const newComment = {
-      id: uuidv4(),
       email,
       name,
       text,
+      eventId,
     };
 
-    return res
-      .status(201)
-      .json({ message: 'Comment posted.', comment: newComment });
+    let result;
+
+    try {
+      result = await insertDocument(client, 'comments', newComment);
+      newComment._id = result.insertedId;
+      res.status(201).json({ message: 'Comment posted.', comment: newComment });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ message: 'Inserting comment to the database failed.' });
+    }
   }
 
   if (req.method === 'GET') {
-    return res.status(200).json({
-      comments: [{ id: 1, name: 'eric', text: 'hello world' }],
-    });
+    try {
+      const documents = await getAllDocuments(client, 'comments', { _id: -1 });
+      res.status(200).json({ comments: documents });
+    } catch (err) {
+      res.status(500).json({ message: 'Unable to fetch all comments.' });
+    }
   }
+
+  client.close();
 };
 
 export default handler;
